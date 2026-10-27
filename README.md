@@ -11,9 +11,9 @@ Tamamen Türkçe arayüze sahip, kullanıcı dostu ve hepsi bir arada Discord pr
    * Bilgisayarınızda açık olan Discord Masaüstü uygulaması, Chrome, Edge, Brave, Opera ve Firefox veritabanlarını tarayarak tokeninizi **otomatik olarak bulur**.
    * Manuel olarak token aramakla veya konsola yapıştırmakla uğraşmanıza gerek kalmaz (isteyen kullanıcılar için manuel giriş seçeneği de mevcuttur).
 
-2. **Sunucu Giriş Kapısı (discord.gg/999):**
-   * Uygulama, kullanıcının `https://discord.gg/999` (`1318438089001144340`) sunucusunda olup olmadığını Discord API üzerinden doğrular.
-   * Sunucuda değilseniz tarayıcınızda otomatik olarak daveti açar ve katılım sağlandıktan sonra özellikleri aktif eder.
+2. **Yayın Kasma İçin Sunucu Entegrasyonu (discord.gg/999):**
+   * Oyun saati ve oyun çeşitliliği rozetlerini kullanmak için herhangi bir sunucu zorunluluğu yoktur, herkes doğrudan çalıştırabilir.
+   * Yalnızca **7/24 Headless Go Live yayın rozeti** kasılmak istendiğinde, yayın `discord.gg/999` sunucusundaki özel ses kanalında açıldığı için kullanıcıyı otomatik olarak sunucuya yönlendirir.
 
 3. **🎮 Oyun Çeşitliliği Rozeti (Game Variety):**
    * İstediğiniz sayıda (örn: 100, 500 veya 999 adet) doğrulanmış oyunu tek tıkla hesabınıza işler.

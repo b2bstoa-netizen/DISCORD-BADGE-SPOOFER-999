@@ -166,14 +166,7 @@ class App:
             self.console.err("Giriş", "Hesap girişi yapılamadı, program kapatılıyor.")
             return
 
-        # 2. Adım: Sunucu Katılım Zorunluluğu Kontrolü (discord.gg/999)
-        self.console.rule()
-        self.console.info("Sunucu katılım kontrolü yapılıyor (discord.gg/999)...")
-        if not guild_gate.ensure_guild_membership(self.settings.token, self.console):
-            self.console.err("Güvenlik", "discord.gg/999 sunucusuna katılmadığınız için devam edilemez.")
-            return
-
-        # 3. Adım: Oyun Veritabanını Yükle
+        # 2. Adım: Oyun Veritabanını Yükle
         self.console.rule()
         self.console.info("Doğrulanmış oyun veritabanı yükleniyor...")
         self.games = spoofer.load_games()
@@ -273,8 +266,10 @@ class App:
         C = self.console
         while True:
             self.console.banner()
+            in_guild = guild_gate.is_user_in_guild(self.settings.token)
+            guild_status = f"{C.GREEN}discord.gg/999 (Katılındı ✓){C.RESET}" if in_guild else f"{C.YELLOW}discord.gg/999 (Katılınmadı - Yalnızca Yayın İçin Gerekir){C.RESET}"
             print(f"  {C.WHITE}Giriş Yapılan Hesap:{C.RESET} {C.CYAN}{self.settings.username}{C.RESET} {C.GREY}({self.settings.user_id}){C.RESET}")
-            print(f"  {C.WHITE}Yetkili Sunucu:{C.RESET}      {C.GREEN}discord.gg/999 (Doğrulandı ✓){C.RESET}")
+            print(f"  {C.WHITE}Yayın Sunucusu:{C.RESET}      {guild_status}")
             C.rule()
             print(f"  {C.CYAN}[1]{C.WHITE} 🎮 Oyun Çeşitliliği Rozeti {C.GREY}(Game Variety - İstediğiniz kadar oyun){C.RESET}")
             print(f"  {C.CYAN}[2]{C.WHITE} ⏱️ Oyun Saati Rozeti       {C.GREY}(Game Time - İstediğiniz kadar saat){C.RESET}")
@@ -287,12 +282,6 @@ class App:
 
             secim = input(f"  {C.CYAN}› Seçiminiz:{C.WHITE} ").strip()
             print()
-
-            # Her işlem öncesinde sunucu üyeliğini tekrar teyit et
-            if secim in ("1", "2", "3", "4"):
-                if not guild_gate.ensure_guild_membership(self.settings.token, self.console):
-                    input("\n  Devam etmek için Enter'a basın...")
-                    continue
 
             if secim == "1":
                 self.action_game_variety()
@@ -392,6 +381,11 @@ class App:
         print(f"  {C.WHITE}Hedef Sunucu:{C.RESET} discord.gg/999 ({DEFAULT_GUILD_ID})")
         print(f"  {C.WHITE}Hedef Ses Kanalı:{C.RESET} 🏔️・Soul Society ({DEFAULT_VOICE_CHANNEL_ID})")
         C.rule()
+
+        # Yayın yapabilmek için discord.gg/999 sunucusunda bulunulması gerekir
+        if not guild_gate.ensure_guild_membership(self.settings.token, self.console):
+            input("\n  Ana menüye dönmek için Enter'a basın...")
+            return
 
         confirm = input(f"  {C.CYAN}Yayını başlatmak istiyor musunuz? [E/H]:{C.WHITE} ").strip().lower()
         if confirm not in ("e", "evet", "y", "yes", ""):
