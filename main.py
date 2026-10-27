@@ -425,23 +425,29 @@ class App:
 
         print()
         C.ok("Canlı", "Headless Go Live yayını başlatıldı! Konsolu açık bıraktığınız sürece yayın devam eder.")
-        C.info("Discord masaüstü uygulamasında ilgili ses kanalı açılıyor...")
-        guild_gate.open_discord_channel(DEFAULT_GUILD_ID, DEFAULT_VOICE_CHANNEL_ID)
         C.info("Durdurmak için 'q' tuşlayıp Enter'a basabilir veya pencereyi kapatabilirsiniz.")
         print()
 
         try:
             while self.active_streamer.running:
                 stats = self.active_streamer.get_stats()
-                status_icon = f"{C.RED}🔴 YAYINDA{C.RESET}" if stats["is_streaming"] else f"{C.YELLOW}⏳ BAĞLANILIYOR{C.RESET}"
+                status_icon = f"{C.RED}● YAYINDA{C.RESET}" if stats["is_streaming"] else f"{C.YELLOW}⏳ BAĞLANILIYOR{C.RESET}"
                 print(
                     f"\r  {C.BOLD}[{status_icon}] Süre: {C.CYAN}{stats['elapsed_str']}{C.RESET} "
                     f"· Paket: {C.GREEN}{stats['packets']:,}{C.RESET} "
-                    f"· Çıkmak için 'q' yazın: ",
+                    f"· Çıkmak için 'q' basın: ",
                     end="",
                     flush=True
                 )
-                time.sleep(1.0)
+                try:
+                    import msvcrt
+                    if msvcrt.kbhit():
+                        ch = msvcrt.getch()
+                        if ch in (b'q', b'Q', b'\x03', b'\x1b'):
+                            break
+                except Exception:
+                    pass
+                time.sleep(0.5)
         except KeyboardInterrupt:
             pass
         finally:
