@@ -1,10 +1,37 @@
 @echo off
-chcp 65001 > nul
-title 999 Badge - Discord Profil Rozet Yöneticisi
+setlocal
 cd /d "%~dp0"
-py -3 main.py
+title 999 Badge
+
+where py >nul 2>nul
+if %errorlevel% equ 0 (
+    py -3 main.py
+    goto end
+)
+
+where python >nul 2>nul
+if %errorlevel% equ 0 (
+    python main.py
+    goto end
+)
+
+where python3 >nul 2>nul
+if %errorlevel% equ 0 (
+    python3 main.py
+    goto end
+)
+
+echo.
+echo ========================================================
+echo  HATA: Bilgisayarinizda Python bulunamadi!
+echo  Lutfen https://www.python.org adresinden Python kurun.
+echo  Kurulumda Add python.exe to PATH kutusunu isaretleyin!
+echo ========================================================
+echo.
+
+:end
 if %errorlevel% neq 0 (
     echo.
-    echo Bir hata oluştu veya program kapandı.
-    pause
+    echo Program kapandi.
 )
+pause
