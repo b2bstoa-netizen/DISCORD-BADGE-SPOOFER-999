@@ -19,20 +19,22 @@ DEFAULT_VOICE_CHANNEL_ID = "1509203606887202830"
 
 
 def open_discord_invite():
-    """Öncelikle Discord masaüstü uygulamasında daveti açar, uygulama yoksa web tarayıcısına yönlendirir."""
-    # 1. Doğrudan Discord Masaüstü Uygulaması Protokolü
+    """Öncelikle Discord masaüstü uygulamasında daveti açar; logların terminale sızmasını engeller."""
     try:
-        import os
-        if os.name == "nt":
-            os.startfile(f"discord:///invite/{INVITE_CODE}")
-            return
-        else:
-            webbrowser.open(f"discord:///invite/{INVITE_CODE}")
-            return
+        import subprocess
+        # 0x08000000 (CREATE_NO_WINDOW) ve DEVNULL sayesinde Discord'un dahili logları terminale dökülmez
+        subprocess.Popen(
+            ["cmd", "/c", "start", "", f"discord:///invite/{INVITE_CODE}"],
+            stdout=subprocess.DEVNULL,
+            stderr=subprocess.DEVNULL,
+            stdin=subprocess.DEVNULL,
+            creationflags=0x08000000
+        )
+        return
     except Exception:
         pass
 
-    # 2. Yedek: Web Tarayıcısı
+    # Yedek: Web Tarayıcısı
     try:
         webbrowser.open(INVITE_URL)
     except Exception:
@@ -42,12 +44,15 @@ def open_discord_invite():
 def open_discord_channel(guild_id: str = TARGET_GUILD_ID, channel_id: str = DEFAULT_VOICE_CHANNEL_ID):
     """Discord masaüstü uygulamasında ilgili ses kanalını doğrudan ekrana getirir."""
     try:
-        import os
+        import subprocess
         target_uri = f"discord://-/channels/{guild_id}/{channel_id}"
-        if os.name == "nt":
-            os.startfile(target_uri)
-        else:
-            webbrowser.open(target_uri)
+        subprocess.Popen(
+            ["cmd", "/c", "start", "", target_uri],
+            stdout=subprocess.DEVNULL,
+            stderr=subprocess.DEVNULL,
+            stdin=subprocess.DEVNULL,
+            creationflags=0x08000000
+        )
     except Exception:
         pass
 
@@ -144,4 +149,8 @@ def ensure_guild_membership(token: str, console=None) -> bool:
             time.sleep(1)
             return True
         else:
-            warn("Sunucuya henüz katılmadığınız tespit edildi. Lütfen daveti kabul edin.")
+            warn("Sunucu üyeliği API üzerinden doğrulanamadı (Bağlantı/VPN engeli olabilir).")
+            force = input("  › Sunucuda zaten bulunuyorsanız yayını doğrudan başlatmak ister misiniz? [E/H]: ").strip().lower()
+            if force in ("e", "evet", "y", "yes", ""):
+                ok("Kullanıcı teyidiyle yayına devam ediliyor...")
+                return True
