@@ -183,13 +183,20 @@ class App:
         C = self.console
         # Kayıtlı token geçerli mi?
         if self.settings.token:
-            profile = browser_auth.validate_token(self.settings.token)
-            if profile:
+            status, profile = browser_auth.check_token(self.settings.token)
+            if status == "OK" and profile:
                 self.settings.username = profile.get("username", "")
                 self.settings.user_id = str(profile.get("id", ""))
                 self.settings.save()
                 C.ok("Giriş", f"Kayıtlı oturum yüklendi: {C.CYAN}{self.settings.username}{C.GREEN} ({self.settings.user_id})")
                 return True
+            elif status == "CONNECTION_ERROR":
+                C.warn("Bağlantı", "Discord sunucularına ulaşılamadı (VPN veya WARP kapalı olabilir).")
+                uname = self.settings.username or "Kayıtlı Kullanıcı"
+                C.info(f"Kayıtlı oturumunuz ({uname}) korunuyor.")
+                choice = input(f"  › Bu hesapla devam etmek için [Enter] basın (Yeni giriş için 'm'): ").strip().lower()
+                if choice not in ("m", "manuel", "new"):
+                    return True
             else:
                 C.warn("Oturum", "Kayıtlı tokenin süresi dolmuş veya geçersiz. Yenileniyor...")
 
@@ -236,9 +243,19 @@ class App:
         if not tok:
             return False
 
-        profile = browser_auth.validate_token(tok)
-        if not profile:
-            C.err("Token", "Geçersiz Discord tokeni girdiniz!")
+        status, profile = browser_auth.check_token(tok)
+        if status == "INVALID":
+            C.err("Token", "Geçersiz Discord tokeni girdiniz! (HTTP 401)")
+            return False
+        elif status == "CONNECTION_ERROR":
+            uid = browser_auth.user_id_from_token(tok)
+            if not uid:
+                C.err("Token", "Token biçimi geçersiz görünüyor!")
+                return False
+            C.warn("Bağlantı", "Discord'a ulaşılamadı (VPN kapalı olabilir), token yerel olarak kabul edildi.")
+            profile = {"username": f"Kullanıcı ({uid})", "id": uid}
+        elif not profile:
+            C.err("Token", "Token doğrulanamadı!")
             return False
 
         self.settings.token = tok
