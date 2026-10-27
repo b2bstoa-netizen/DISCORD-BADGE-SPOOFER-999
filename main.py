@@ -408,6 +408,8 @@ class App:
 
         print()
         C.ok("Canlı", "Headless Go Live yayını başlatıldı! Konsolu açık bıraktığınız sürece yayın devam eder.")
+        C.info("Discord masaüstü uygulamasında ilgili ses kanalı açılıyor...")
+        guild_gate.open_discord_channel(DEFAULT_GUILD_ID, DEFAULT_VOICE_CHANNEL_ID)
         C.info("Durdurmak için 'q' tuşlayıp Enter'a basabilir veya pencereyi kapatabilirsiniz.")
         print()
 
